@@ -2,6 +2,7 @@ import pygame
 import numpy as np
 import random
 import os
+import copy
 
 class Tile:
     def __init__(self, image, edges):
@@ -9,12 +10,12 @@ class Tile:
         self.edges = edges
 
 class Cell:
-    def __init__(self, collapsed, options):
-        self.collapsed = collapsed
+    def __init__(self, options):
+        self.collapsed = False
         self.options = options
 
 WIDTH, HEIGHT = 800, 800
-ROWS, COLS = 2,2
+ROWS, COLS = 4,4
 CELL_SIZE = WIDTH // COLS
 GRID = np.empty((ROWS, COLS),object)
 
@@ -32,22 +33,22 @@ for img_file in image_files:
     img = pygame.transform.scale(img, (CELL_SIZE,CELL_SIZE))
     images.append(img)
 
-#blank_tile = Tile(images[0],[0,0,0,0])
-#up_tile = Tile(images[1],[1,1,0,1])
-#right_tile = Tile(images[2],[1,1,1,0])
-#down_tile = Tile(images[3],[0,1,1,1])
-#left_tile = Tile(images[4],[1,0,1,1])
+Tiles = [
+    Tile(images[0],[0,0,0,0]), #blank
+    Tile(images[1],[1,1,0,1]), #up
+    Tile(images[2],[1,1,1,0]), #right
+    Tile(images[3],[0,1,1,1]), #down
+    Tile(images[4],[1,0,1,1])  #left
+]
 
-BLANK = 0
-UP = 1
-RIGHT = 2
-DOWN = 3
-LEFT = 4
-
-for row in range(ROWS):
-    for col in range(COLS):
-        GRID[row][col] = Cell(False,[BLANK,UP,RIGHT,DOWN,LEFT])
-
+GRID = []
+for i in range(ROWS):
+    row = []
+    for j in range(COLS):
+        cell = Cell(list(range(len(Tiles))))
+        row.append(cell)
+    GRID.append(row)
+        
 def draw():
     for row in range(ROWS):
         for col in range(COLS):
@@ -56,10 +57,7 @@ def draw():
                 index = cell.options[0]
                 x, y = col * CELL_SIZE, row * CELL_SIZE
                 window.blit(images[index], (x, y))
-
-#GRID[0][0].collapsed = True
-#GRID[0][0].options = [UP]
-
+                    
 running = True
 while running:
     for event in pygame.event.get():
