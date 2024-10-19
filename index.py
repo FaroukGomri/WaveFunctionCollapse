@@ -24,7 +24,7 @@ window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Wave Function Collapse")
 
 image_folder = os.path.join(os.path.dirname(__file__),"Tiles")
-image_files = ["Tile1.png","Tile5.png","Tile8.png","Tile6.png","Tile7.png"]#,"Tile5.png","Tile6.png","Tile7.png","Tile8.png"
+image_files = ["Tile1.png","Tile5.png","Tile8.png","Tile6.png","Tile7.png","Tile2.png","Tile3.png","Tile4.png"]
 images = []
 
 for img_file in image_files:
@@ -38,7 +38,10 @@ Tiles = [
     Tile(images[1],[1,1,0,1]), #up
     Tile(images[2],[1,1,1,0]), #right
     Tile(images[3],[0,1,1,1]), #down
-    Tile(images[4],[1,0,1,1])  #left
+    Tile(images[4],[1,0,1,1]), #left
+    Tile(images[5],[0,1,0,1]),
+    Tile(images[6],[1,0,1,0]),
+    Tile(images[7],[1,1,1,1])
 ]
 
 GRID = []
