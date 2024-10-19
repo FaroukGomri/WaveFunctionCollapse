@@ -15,7 +15,7 @@ class Cell:
         self.options = options
 
 WIDTH, HEIGHT = 800, 800
-ROWS, COLS = 4,4
+ROWS, COLS = 50,50
 CELL_SIZE = WIDTH // COLS
 GRID = np.empty((ROWS, COLS),object)
 
@@ -48,7 +48,51 @@ for i in range(ROWS):
         cell = Cell(list(range(len(Tiles))))
         row.append(cell)
     GRID.append(row)
-        
+
+def IsValidNeighbor(tile, neighborTile, direction):
+    neighborDirection = 0
+
+    if direction >= 2:
+        neighborDirection = direction - 2
+    else:
+        neighborDirection = direction + 2
+    
+    return tile.edges[direction] == neighborTile.edges[neighborDirection]
+
+def CollapseCell(GRID):
+    minEntropy = float("inf")
+    targetCell = None
+
+    for row in range(ROWS):
+        for col in range(COLS):
+            cell = GRID[row][col]
+            if not cell.collapsed and len(cell.options) < minEntropy:
+                minEntropy = len(cell.options)
+                targetCell = cell, row, col
+    
+    if targetCell:
+        cell, row, col = targetCell
+        chosenTile = random.choice(cell.options)
+        cell.options = [chosenTile]
+        cell.collapsed = True
+        return row, col
+    
+    return None
+
+def propagate(GRID,row,col):
+    directions = [(-1,0),(0,1),(1,0),(0,-1)]
+    tileIndex = GRID[row][col].options[0]
+    tile = Tiles[tileIndex]
+
+    for d,(dy,dx) in enumerate(directions):
+        neighborRow, neighborCol = row + dy, col + dx
+        if 0 <= neighborRow < ROWS and 0 <= neighborCol < COLS:
+            neighbor = GRID[neighborRow][neighborCol]
+            if not neighbor.collapsed :
+                neighbor.options = [
+                    i for i in neighbor.options if IsValidNeighbor(tile,Tiles[i],d)
+                ]
+
 def draw():
     for row in range(ROWS):
         for col in range(COLS):
@@ -57,13 +101,18 @@ def draw():
                 index = cell.options[0]
                 x, y = col * CELL_SIZE, row * CELL_SIZE
                 window.blit(images[index], (x, y))
-                    
+
+
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
     
+    result = CollapseCell(GRID)
+    if result:
+        row, col = result
+        propagate(GRID,row,col)
 
     window.fill((0,0,0))
 
