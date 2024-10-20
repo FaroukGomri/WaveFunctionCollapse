@@ -2,7 +2,6 @@ import pygame
 import numpy as np
 import random
 import os
-import copy
 
 class Tile:
     def __init__(self, image, edges):
