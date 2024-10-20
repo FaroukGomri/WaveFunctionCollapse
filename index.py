@@ -15,7 +15,7 @@ class Cell:
         self.options = options
 
 WIDTH, HEIGHT = 800, 800
-ROWS, COLS = 50,50
+ROWS, COLS = 20,20
 CELL_SIZE = WIDTH // COLS
 GRID = np.empty((ROWS, COLS),object)
 
@@ -23,8 +23,38 @@ pygame.init()
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Wave Function Collapse")
 
+def MakeTiles(BaseTiles):
+    Tiles = []
+    for baseTile in BaseTiles:
+        #Rotation 0
+        Tiles.append(baseTile)
+
+        #Rotation -90
+        R0 = baseTile
+        Edges = [R0.edges[len(R0.edges)-1],0,0,0]
+        for i in range(1,len(R0.edges)):
+            Edges[i] = R0.edges[i-1]
+        Rm90 = Tile(pygame.transform.rotate(R0.image,-90),Edges)
+        Tiles.append(Rm90)
+
+        #Rotation 180
+        Edges = [Rm90.edges[len(Rm90.edges)-1],0,0,0]
+        for i in range(1,len(Rm90.edges)):
+            Edges[i] = Rm90.edges[i-1]
+        R180 = Tile(pygame.transform.rotate(Rm90.image,-90),Edges)
+        Tiles.append(R180)
+
+        #Rotation 90
+        Edges = [R180.edges[len(R180.edges)-1],0,0,0]
+        for i in range(1,len(R180.edges)):
+            Edges[i] = R180.edges[i-1]
+        R90 = Tile(pygame.transform.rotate(R180.image,-90),Edges)
+        Tiles.append(R90)
+
+    return Tiles
+
 image_folder = os.path.join(os.path.dirname(__file__),"Tiles")
-image_files = ["Tile1.png","Tile5.png","Tile8.png","Tile6.png","Tile7.png","Tile2.png","Tile3.png","Tile4.png"]
+image_files = ["Tile1.png","Tile2.png","Tile4.png","Tile5.png"]
 images = []
 
 for img_file in image_files:
@@ -33,16 +63,14 @@ for img_file in image_files:
     img = pygame.transform.scale(img, (CELL_SIZE,CELL_SIZE))
     images.append(img)
 
-Tiles = [
-    Tile(images[0],[0,0,0,0]), #blank
-    Tile(images[1],[1,1,0,1]), #up
-    Tile(images[2],[1,1,1,0]), #right
-    Tile(images[3],[0,1,1,1]), #down
-    Tile(images[4],[1,0,1,1]), #left
-    Tile(images[5],[0,1,0,1]),
-    Tile(images[6],[1,0,1,0]),
-    Tile(images[7],[1,1,1,1])
+BaseTiles = [
+    Tile(images[0],[0,0,0,0]),
+    Tile(images[1],[0,1,0,1]),
+    Tile(images[2],[1,1,1,1]),
+    Tile(images[3],[1,1,0,1])
 ]
+
+Tiles = MakeTiles(BaseTiles)
 
 GRID = []
 for i in range(ROWS):
@@ -103,8 +131,10 @@ def draw():
             if cell.collapsed:
                 index = cell.options[0]
                 x, y = col * CELL_SIZE, row * CELL_SIZE
-                window.blit(images[index], (x, y))
+                window.blit(Tiles[index].image, (x, y))
 
+Clock = pygame.time.Clock()
+FPS = 60
 
 running = True
 while running:
@@ -122,5 +152,7 @@ while running:
     draw()
 
     pygame.display.flip()
+
+    Clock.tick(FPS)
 
 pygame.quit
