@@ -154,4 +154,4 @@ while running:
 
     Clock.tick(FPS)
 
-pygame.quit
+pygame.quit()
